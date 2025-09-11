@@ -11,6 +11,8 @@ public class PlayerTankController : MonoBehaviour
     private float turretRotSpeed = 10.0f;
     private float maxForwardSpeed = 300.0f;
     private float maxBackwardSpeed = -300.0f;
+    public int maxHealth = 5;
+    private int currHealth;
 
     //Bullet shooting rate
     protected float shootRate;
@@ -24,6 +26,8 @@ public class PlayerTankController : MonoBehaviour
         //Get the turret of the tank
         Turret = gameObject.transform.GetChild(0).transform;
         bulletSpawnPoint = Turret.GetChild(0).transform;
+
+        currHealth = maxHealth;
     }
 
     void OnEndGame()
@@ -37,7 +41,14 @@ public class PlayerTankController : MonoBehaviour
         UpdateControl();
         UpdateWeapon();
     }
-    
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Bullet") && --currHealth <= 0) {
+            OnEndGame();
+        }
+    }
+
     void UpdateControl()
     {
         //AIMING WITH THE MOUSE
