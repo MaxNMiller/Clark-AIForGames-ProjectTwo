@@ -4,7 +4,7 @@ using System.Collections;
 public class FSM : MonoBehaviour 
 {
     //Player Transform
-    protected Transform playerTransform;
+    [SerializeField] protected Transform playerTransform;
 
     //Next destination position of the NPC Tank
     protected Vector3 destPos;

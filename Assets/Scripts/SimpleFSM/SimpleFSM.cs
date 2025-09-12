@@ -1,9 +1,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic; // Needed for Dictionary
-
+using UnityEngine.UI;
 public class SimpleFSM : FSM
 {
+    public Image healthBar;
+    public int StartingHealth = 100;
     public enum FSMState
     {
         None,
@@ -52,7 +54,19 @@ public class SimpleFSM : FSM
 
     //Whether the NPC is destroyed or not
     private bool bDead;
-    private int health;
+     private int health
+    {
+        get
+        {
+            return _health;
+        }
+        set
+        {
+            _health = value;
+            healthBar.fillAmount = (float)_health / (float)StartingHealth;
+        }
+    }
+    [SerializeField] private int _health = 100;
 
 
     //Initialize the Finite state machine for the NPC tank
@@ -74,8 +88,8 @@ public class SimpleFSM : FSM
         bDead = false;
         elapsedTime = 0.0f;
         shootRate = 3.0f;
-        health = 100;
-
+        health = StartingHealth;
+       
         //Get the list of points
         pointList = GameObject.FindGameObjectsWithTag("WandarPoint");
 
@@ -83,8 +97,8 @@ public class SimpleFSM : FSM
         FindNextPoint();
 
         //Get the target enemy(Player)
-        GameObject objPlayer = GameObject.FindGameObjectWithTag("Player");
-        playerTransform = objPlayer.transform;
+        //GameObject objPlayer = GameObject.FindGameObjectWithTag("Player");
+        //playerTransform = objPlayer.transform;
 
         if (!playerTransform)
             print("Player doesn't exist.. Please add one with Tag named 'Player'");
