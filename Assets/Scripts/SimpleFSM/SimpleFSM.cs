@@ -13,6 +13,7 @@ public class SimpleFSM : FSM
         Chase,
         Attack,
         Dead,
+        Dance,
     }
 
     [System.Serializable]
@@ -52,6 +53,8 @@ public class SimpleFSM : FSM
     //Bullet
     public GameObject Bullet;
 
+    //Dance
+    float startDanceTime, stopDanceTime;
     //Whether the NPC is destroyed or not
     private bool bDead;
      private int health
@@ -130,6 +133,7 @@ public class SimpleFSM : FSM
             case FSMState.Chase: UpdateChaseState(); break;
             case FSMState.Attack: UpdateAttackState(); break;
             case FSMState.Dead: UpdateDeadState(); break;
+            case FSMState.Dance: UpdateDanceState(); break;
         }
 
         //Update the time
@@ -138,6 +142,21 @@ public class SimpleFSM : FSM
         //Go to dead state is no health left
         if (health <= 0)
             CurState = FSMState.Dead; // MODIFIED
+    }
+
+    protected void UpdateDanceState()
+    {
+        transform.Rotate(new Vector3(0, 1, 0));
+        if (elapsedTime >= stopDanceTime)
+        {
+            CurState = FSMState.Patrol;
+            startDanceTime = elapsedTime + Random.Range(2, 5);
+        }
+        if (Vector3.Distance(transform.position, playerTransform.position) <= 300.0f)
+        {
+            print("Switch to Chase Position");
+            CurState = FSMState.Chase; // MODIFIED
+        }
     }
 
     protected void UpdatePatrolState()
@@ -156,6 +175,12 @@ public class SimpleFSM : FSM
         Quaternion targetRotation = Quaternion.LookRotation(destPos - transform.position);
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
         transform.Translate(Vector3.forward * Time.deltaTime * curSpeed);
+
+        if(elapsedTime > startDanceTime)
+        {
+            stopDanceTime = elapsedTime + Random.Range(1, 2);
+            CurState = FSMState.Dance;
+        }
     }
 
     protected void UpdateChaseState()
