@@ -6,6 +6,7 @@ public class SimpleFSM : FSM
 {
     public Image healthBar;
     public int StartingHealth = 100;
+    public int criticalHealth;
     public enum FSMState
     {
         None,
@@ -14,6 +15,8 @@ public class SimpleFSM : FSM
         Attack,
         Dead,
         Dance,
+        Ninja,
+        Heal
     }
 
     [System.Serializable]
@@ -139,9 +142,15 @@ public class SimpleFSM : FSM
         //Update the time
         elapsedTime += Time.deltaTime;
 
-        //Go to dead state is no health left
         if (health <= 0)
-            CurState = FSMState.Dead; // MODIFIED
+        {
+            CurState = FSMState.Dead;
+        }
+        else if (health <= criticalHealth)
+        {
+            CurState = FSMState.Heal;
+        }
+
     }
 
     protected void UpdateDanceState()
