@@ -182,15 +182,22 @@ public class SimpleFSM : FSM
             hasPredictor = true;
         }
 
-        // Rotate toward the ambush point
-        Quaternion targetRotation = Quaternion.LookRotation(ambushPoint - transform.position);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed * 2.0f);
+        float distToAmbush = Vector3.Distance(transform.position, ambushPoint);
 
-        // Move toward ambush point and stop when close
-        float step = curSpeed * 1.5f * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position, ambushPoint, step);
+        if (distToAmbush > 0.1f) // Move toward ambush point
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(ambushPoint - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed * 2.0f);
 
-        // Switch to attack if the player is close
+            float step = curSpeed * 1.5f * Time.deltaTime;
+            transform.position = Vector3.MoveTowards(transform.position, ambushPoint, step);
+        }
+        else // Stop moving, rotate to track player
+        {
+            Quaternion lookAtPlayer = Quaternion.LookRotation(playerTransform.position - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookAtPlayer, Time.deltaTime * curRotSpeed * 2.0f);
+        }
+
         float distToPlayer = Vector3.Distance(transform.position, playerTransform.position);
         if (distToPlayer <= 200.0f)
         {
