@@ -76,8 +76,16 @@ public class PredictPlayer : MonoBehaviour
         if (lookahead <= 0f)
             lookahead = predictionTime;
 
-        return estimatedPos + estimatedVel * lookahead;
+        Vector3 predicted = estimatedPos + estimatedVel * lookahead;
+
+        // Clamp X and Z so the position stays inside the map
+        predicted.x = Mathf.Clamp(predicted.x, 0f, 190f);
+        predicted.y = Mathf.Clamp(predicted.y, 0f, 1f);
+        predicted.z = Mathf.Clamp(predicted.z, 0f, 190f);
+
+        return predicted;
     }
+
 
     void OnDrawGizmos()
     {
