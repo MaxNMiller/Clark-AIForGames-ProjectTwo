@@ -11,6 +11,8 @@ public class SimpleFSM : FSM
     public PredictPlayer playerpredictor;
     private bool hasPredictor = false;
     private Vector3 ambushPoint;
+    [SerializeField] Transform tankCamp;
+    public bool inTankCamp = false;
     public enum FSMState
    
     {
@@ -103,6 +105,7 @@ public class SimpleFSM : FSM
             case FSMState.Dead: UpdateDeadState(); break;
             case FSMState.Dance: UpdateDanceState(); break;
             case FSMState.Ninja: UpdateNinjaState(); break;
+            case FSMState.Heal: UpdateHealState(); break;
         }
 
         elapsedTime += Time.deltaTime;
@@ -110,7 +113,43 @@ public class SimpleFSM : FSM
         if (health <= 0) CurState = FSMState.Dead;
         else if (health <= criticalHealth) CurState = FSMState.Heal;
     }
+    float zigZag = 0;
+    float healTimer = 0;
+    protected void UpdateHealState()
+    {
+        destPos = tankCamp.transform.position;
+        if (Vector3.Distance(destPos, transform.position) >= 100)
+        {
+          
+            zigZag += Time.deltaTime;
+            Quaternion targetRotation = Quaternion.LookRotation((destPos - transform.position));
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * curRotSpeed);
+            if((int)zigZag % 2 == 0)
+            {
+                transform.Translate((Vector3.forward+Vector3.right) * Time.deltaTime * curSpeed);
+            }
+            else
+            {
+                transform.Translate((Vector3.forward-Vector3.right) * Time.deltaTime * curSpeed);
+            }
+            
+        }
+        else
+        {
+            transform.Translate((Vector3.forward - Vector3.right) * Time.deltaTime * curSpeed);
+            healTimer += Time.deltaTime;
+            if((int)healTimer%2==0)
+            {
+                health += 5;
+            }
+            if(health >= StartingHealth)
+            {
+                CurState = FSMState.Patrol;
+            }
+        }
 
+     
+    }
     protected void UpdateDanceState()
     {
         transform.Rotate(new Vector3(0, 1, 0));
